@@ -1,0 +1,118 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'src/css/Page1.css' %}">
+    <title>Login - HMS</title>
+    <!-- Firebase v9+ SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-auth.js";
+    
+        const firebaseConfig = {
+            apiKey: "AIzaSyAfIkSug5mkJvspZQXvvAthFg8GajqD-So",
+            authDomain: "meera-bhawan-hms-7ceb7.firebaseapp.com",
+            projectId: "meera-bhawan-hms-7ceb7",
+            storageBucket: "meera-bhawan-hms-7ceb7.firebasestorage.app",
+            messagingSenderId: "868784800832",
+            appId: "1:868784800832:web:a41e9a943e5e44bc5d8ba5",
+            measurementId: "G-0DM4NR8T0T"
+        };
+    
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+    
+        // Handle Google Sign-In Redirect
+        getRedirectResult(auth)
+            .then(async (result) => {
+                if (result) {
+                    try {
+                        const user = result.user;
+                        const email = user.email;
+    
+                        // Validate BITS Email
+                        if (!email.endsWith('@pilani.bits-pilani.ac.in')) {
+                            alert("Only BITS students can log in with Google.");
+                            await auth.signOut();
+                            return;
+                        }
+    
+                        // Get Firebase ID Token
+                        const idToken = await user.getIdToken();
+    
+                        // Authenticate with Django Backend
+                        const response = await fetch("{% url 'auth_receiver' %}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            body: JSON.stringify({ id_token: idToken, email: email }),
+                            credentials: 'include'  // Critical for session cookies
+                        });
+    
+                        if (response.ok) {
+                            const data = await response.json();
+                            if (data.success) {
+                                // Redirect to the dashboard
+                                window.location.href = data.redirect_url;
+                            } else {
+                                alert(data.error);
+                            }
+                        } else {
+                            alert("Authentication failed.");
+                        }
+                    } catch (error) {
+                        console.error("Error:", error);
+                        alert("An error occurred. Please try again.");
+                    }
+                }
+            })
+            .catch((error) => {
+                console.error("Google Sign-In Error:", error);
+                alert("Google Sign-In failed. Please try again.");
+            });
+    
+        // Google Sign-In Button Handler
+        document.addEventListener('DOMContentLoaded', () => {
+            const googleSignInButton = document.getElementById('google-sign-in');
+            if (googleSignInButton) {
+                googleSignInButton.addEventListener('click', () => {
+                    const provider = new GoogleAuthProvider();
+                    signInWithRedirect(auth, provider);
+                });
+            }
+        });
+    </script>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Welcome Back To <span class="highlight">HMS!</span></h1>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Normal Login Form -->
+        <form class="login-form" method="POST" action="{% url 'login_view' %}">
+            {% csrf_token %}
+            <input type="email" name="email" placeholder="Email" required autocomplete="off">
+            <input type="password" name="password" placeholder="Password" required autocomplete="off">
+            <button type="submit">Login</button>
+        </form>
+
+        <div class="divider">or</div>
+
+        <!-- Google Login Button -->
+        <!--button id="google-sign-in" class="google-btn">Sign in with Google</!--button-->
+
+        <p class="signup-text">
+            New to HMS? <a href="{% url 'signup' %}" class="signup-link">Sign Up</a>
+        </p>
+    </div>
+</body>
+</html>

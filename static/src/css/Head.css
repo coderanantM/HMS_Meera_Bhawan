@@ -1,0 +1,46 @@
+/* Main container */
+.Head {
+    text-align: left;
+    background-color: #f4f4f4;
+    padding: 20px;
+  }
+  
+  /* Header Row: Flexbox for alignment */
+  .header-container {
+    width: 100%;
+  }
+  
+  .header-row {
+    display: flex;
+    justify-content: space-between; /* Align "Welcome to" and "BITS, Pilani" */
+    align-items: center;
+    margin-bottom: 2px; /* Reduce space between header row and tagline */
+  }
+  
+  .header-row h1 {
+    margin: 0; /* Remove default margin */
+    font-size: 1.5rem;
+    color: #777;
+  }
+  
+  .bits-text {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #777;
+    text-align: right; /* Align text to the right */
+  }
+  
+  /* Tagline */
+  .tagline {
+    margin: 2px 0; /* Reduce space around text */
+    font-size: 2.5rem;
+    color: #e27145;
+  }
+  
+  /* Subtext */
+  .subtext {
+    margin: 2px 0;
+    font-size: 1.5rem;
+    color: #777;
+  }
+  

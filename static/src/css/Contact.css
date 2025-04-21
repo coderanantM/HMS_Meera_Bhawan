@@ -1,0 +1,30 @@
+.contact-container {
+    max-width: 100%;
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  h2 {
+    text-align: left;
+    color: #e27145;
+    margin-bottom: 20px;
+  }
+  
+  .contact-item {
+    margin-bottom: 15px;
+    color: #777;
+    line-height: 1.6;
+  }
+  
+  .contact-item a {
+    color: #e27145;
+    text-decoration: none;
+  }
+  
+  .contact-item a:hover {
+    text-decoration: underline;
+  }
+  

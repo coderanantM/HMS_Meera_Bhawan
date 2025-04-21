@@ -1,0 +1,212 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active Complaints</title>
+    <link rel="stylesheet" href="{% static 'src/css/Page7.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/Head.css' %}">
+</head>
+<body>
+    <div class="complaints-container">
+        {% include 'complaints/Navbarplain.html' %}
+        {% include 'complaints/Head.html' %}
+        <section>
+            <div class="Main-text">
+                <h2>Active Complaints</h2>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        
+                        <th>Sr. No</th>
+                        <th>IST</th>
+                        
+                        <th>Bhavan</th>
+                        <th>Room No.</th>
+                        <th>Requirement</th>
+                        <th>Category</th>
+                        <th>Time</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="active-complaints-tbody">
+                    <!-- Complaints will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </section>
+        
+        <div class="center-container">
+            <form method="post" action="{% url 'logout_view' %}">
+                {% csrf_token %}
+                <button type="submit" class="red-button">Logout</button>
+            </form>
+        </div>
+        <div class="center-container">
+            <button id="print-receipt-btn" class="orange-button">
+              Print Receipt
+            </button>
+            <label for="sr-no-dropdown">Select Sr. No:</label>
+            <select id="sr-no-dropdown" class="dropdown">…</select>
+            <input type="number" id="sr-no-input" class="input-box" placeholder="Enter Sr. No">
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchActiveComplaints();
+    
+            // Add event listener to the Export to CSV button
+            document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
+        });
+    
+        function fetchActiveComplaints() {
+            fetch('/complaints/api/active-complaints/')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('active-complaints-tbody');
+                    const dropdown = document.getElementById('sr-no-dropdown');
+                    tbody.innerHTML = ''; // Clear existing rows
+                    dropdown.innerHTML = '<option value="">Select Sr. No</option>';
+        
+                    data.forEach((complaint, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${index + 1}</td>
+                            <td>${complaint.IST}</td>
+                            
+                            <td>${complaint.bhavan}</td>
+                            <td>${complaint.room}</td>
+                            <td>${complaint.requirement}</td>
+                            <td>${complaint.category}</td>
+                            <td>${complaint.preferred_time}</td>
+                            <td>${complaint.description}</td>
+                            <td>
+                                ${complaint.status === "Sent to EMS" ? `
+                                    <button class="approve-button" onclick="approveComplaint(${complaint.id})">Approve</button>
+                                ` : `<span>${complaint.status}</span>`}
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+
+                        // Populate the dropdown menu
+                        const option = document.createElement('option');
+                        option.value = index + 1; // Use the Sr. No as the value
+                        option.textContent = index + 1; // Display the Sr. No
+                        dropdown.appendChild(option);
+                        
+                    });
+                })
+                .catch(error => console.error('Error fetching active complaints:', error));
+        }
+        
+        function approveComplaint(complaintId) {
+            fetch('/complaints/api/update-ems-status-and-student-status/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: `complaint_id=${complaintId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+        
+                    // Update the status field dynamically
+                    const statusCell = document.querySelector(`#active-complaints-tbody tr td:nth-child(9)`);
+                    if (statusCell) {
+                        statusCell.innerHTML = `<span>In Progress</span>`; // Update the status text
+                    }
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating EMS status:', error);
+                alert('An error occurred while updating the EMS status.');
+            });
+        }
+        
+        
+        function updateEMSStatus(complaintId) {
+            fetch('/complaints/api/update-ems-status/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: `complaint_id=${complaintId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+        
+                    // Update the EMS Status field dynamically
+                    const emsStatusCell = document.querySelector(`#ems-status-${complaintId}`);
+                    if (emsStatusCell) {
+                        emsStatusCell.innerHTML = `<span>In Progress</span>`; // Update the EMS Status text
+                    }
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating EMS status:', error);
+                alert('An error occurred while updating the EMS status.');
+            });
+        }
+    
+        function exportToCSV() {
+            const dropdown = document.getElementById('sr-no-dropdown');
+            const inputBox = document.getElementById('sr-no-input');
+            const selectedSrNo = dropdown.value || inputBox.value; // Use dropdown value or input box value
+
+    if (!selectedSrNo) {
+        alert('Please select or enter a Sr. No to export.');
+        return;
+    }
+
+    // Find the selected complaint in the table
+    const tbody = document.getElementById('active-complaints-tbody');
+    const rows = tbody.querySelectorAll('tr');
+    let selectedComplaintData = null;
+
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td');
+        const srNo = cells[0].textContent.trim(); // Assuming the first column contains the Sr. No
+        if (srNo === selectedSrNo) {
+            selectedComplaintData = Array.from(cells).map(cell => cell.textContent.trim());
+        }
+    });
+
+    if (!selectedComplaintData) {
+        alert('Selected complaint not found.');
+        return;
+    }
+
+    // Generate CSV content
+    let csvContent = 'data:text/csv;charset=utf-8,';
+    csvContent += 'Sr. No,IST,Bhavan,Room No.,Requirement,Category,Time,Description,Status\n'; // Header row
+    csvContent += selectedComplaintData.join(',') + '\n';
+
+    // Create a downloadable link
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `complaint_srno_${selectedSrNo}.csv`);
+    document.body.appendChild(link);
+
+    // Trigger the download
+    link.click();
+
+    // Clean up
+    document.body.removeChild(link);
+        }
+    </script>
+</body>
+</html>

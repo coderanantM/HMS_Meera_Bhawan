@@ -1,0 +1,58 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Information</title>
+    <link rel="stylesheet" href="{% static 'src/css/Page5.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/Head.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/Navbar.css' %}">
+</head>
+<body>
+    {% include 'complaints/Head.html' %}
+    {% include 'complaints/Navbar.html' %}
+    <div class="team-info-container">
+        <section class="team-section">
+            <div class="faculty">
+                <h2 class="section-header">Faculty Incharge</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Designation</th>
+                            <th>Email/Phone No.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ incharge.name }}</td>
+                            <td>{{ incharge.designation }}</td>
+                            <td>{{ incharge.email }} / {{ incharge.phone }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="technical-manager">
+                <h2 class="section-header">Technical Manager</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Designation</th>
+                            <th>Email/Phone No.</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ technical_manager.name }}</td>
+                            <td>{{ technical_manager.designation }}</td>
+                            <td>{{ technical_manager.email }} / {{ technical_manager.phone }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

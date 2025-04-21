@@ -1,0 +1,81 @@
+<!-- filepath: /c:/My files/hms/complaints/templates/complaints/Page4.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Previous Complaints</title>
+    <link rel="stylesheet" href="{% static 'src/css/Page6.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/Head.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/Navbar.css' %}">
+</head>
+<body>
+    <div class="complaints-container">
+        <header>
+            {% include 'complaints/Head.html' %}
+            {% include 'complaints/Navbar.html' %}
+        </header>
+        <section>
+            <div class="Main-text">
+                <h2>Previous Complaints</h2>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sr. No</th>
+                        <th>IST</th>
+                        <th>Name</th>
+                        <th>BITS ID</th>
+                        <th>Contact No.</th>
+                        <th>Room No.</th>
+                        <th>Area</th>
+                        <th>Requirement</th>
+                        <th>Category</th>
+                        <th>Time</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="complaints-tbody">
+                    <!-- Complaints will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchComplaints();
+        });
+
+        function fetchComplaints() {
+            fetch('{% url 'fetch_warden_complaints' %}')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('complaints-tbody');
+                    tbody.innerHTML = ''; // Clear existing rows
+                    data.forEach((complaint, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${index + 1}</td>
+                            <td>${complaint.IST}</td>
+                            <td>${complaint.name}</td> <!-- Render the parsed name -->
+                            <td>${complaint.bitsId}</td> <!-- Render the full email -->
+                            <td>${complaint.contact_no}</td>
+                            <td>${complaint.room}</td>
+                            <td>${complaint.area}</td>
+                            <td>${complaint.requirement}</td>
+                            <td>${complaint.category}</td>
+                            <td>${complaint.preferred_time}</td>
+                            <td>${complaint.description}</td>
+                            <td><span>${complaint.status}</span></td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Error fetching complaints:', error));
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,521 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'src/css/Page8.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/Head.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/Navbarstu.css' %}">
+    <title>Complaint Form</title>
+</head>
+<body>
+    <div class="hostel-container">
+        {% include 'complaints/Head.html' %}
+        {% include 'complaints/Navbarstu.html' %}
+        <form class="complaint-form" method="post" action="{% url 'submit_complaint' %}">
+            {% csrf_token %}
+            <h2>Put a Complaint!</h2>
+            
+            <div class="form-group">
+                <label for="bhavan">Bhavan</label>
+                <select name="bhavan" id="bhavan" required>
+                    <option value="">Select Bhavan</option>
+                    <option value="Meera Bhavan">Meera Bhavan</option>
+                </select>
+            </div>
+    
+            <div class="form-group" id="roomField">
+                <label for="room">Room</label>
+                <input type="text" name="room" id="room" placeholder="Enter room number"/>
+            </div>
+    
+            <div class="form-group">
+                <label for="contactNo">Contact No.</label>
+                <input type="text" name="contactNo" id="contactNo" placeholder="Enter your contact number" required />
+            </div>
+    
+            <div class="horizontal-option">
+                <label>Complaint Group</label>
+                <div class="options">
+                    <label class="option">
+                        <input type="radio" name="complaintGroup" value="Common" onclick="toggleFields()" required /> Common
+                    </label>
+                    <label class="option">
+                        <input type="radio" name="complaintGroup" value="Room" onclick="toggleFields()" required /> Room
+                    </label>
+                </div>
+            </div>
+    
+            <!-- Area Field for Common Complaints -->
+            <div class="form-group" id="areaField" style="display: none;">
+                <label for="area">Area</label>
+                <select name="area" id="area" onchange="updateRequirements()">
+                    <option value="">Select Area</option>
+                    <option value="Washroom">Washroom</option>
+                    <option value="VisitorsRoom">Visitors Room</option>
+                    <option value="Corridor">Corridor</option>
+                    <option value="CommonRoom">Common Room</option>
+                    <option value="Mess">Mess</option>
+                    <option value="WardenRoom">Warden Room</option>
+                    <option value="Garden">Garden</option>
+                    <option value="RO">RO</option>
+                    <option value="Others">Others</option>
+                </select>
+            </div>
+    
+            <!-- Category Field for Both Common and Room Complaints -->
+            <div class="form-group" id="categoryField" style="display: none;">
+                <label for="category">Category</label>
+                <select name="category" id="category" onchange="updateRequirements()">
+                    <option value="">Select Category</option>
+                    <option value="Electrical">Electrical</option>
+                    <option value="Plumbing">Plumbing</option>
+                    <option value="Carpentry">Carpentry</option>
+                    
+                    <option value="Mason">Mason</option>
+                    <option value="Painter">Painter</option>
+                    <option value="Worker">Worker</option>
+                    <option value="Sweeper">Sweeper</option>
+                    <option value="Gardener">Gardener</option> <!-- Added Gardener -->
+                    <option value="ROPerson">ROPerson</option> <!-- Added ROPerson -->
+                </select>
+            </div>
+    
+            <!-- Requirement Field for Both Common and Room Complaints -->
+            <div class="form-group" id="requirementField">
+                <label for="requirement">Requirement</label>
+                <select name="requirement" id="requirement" required>
+                    <option value="">Select Requirement</option>
+                </select>
+            </div>
+    
+            <!-- Preferred Time Field Only for Room Complaints -->
+            <div class="form-group" id="timeField" style="display: none;">
+                <label for="preferredTime">Preferred Time</label>
+                <select name="preferredTime" id="preferredTime">
+                    <option value="">Select Time</option>
+                    {% for time in time_options %}
+                    <option value="{{ time.value }}">{{ time.label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+    
+            <div class="form-group">
+                <label for="comments">Additional Comments</label>
+                <textarea name="comments" id="comments" placeholder="Write your comments here"></textarea>
+            </div>
+    
+            <div class="center-container">
+                <button type="submit" class="orange-button">Submit</button>
+            </div>
+        </form>
+         
+        <div class="center-container">
+            <form method="post" action="{% url 'logout_view' %}">
+                {% csrf_token %}
+                <button type="submit" class="red-button">Logout</button>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        function toggleFields() {
+            let commonSelected = document.querySelector('input[name="complaintGroup"][value="Common"]').checked;
+            let roomSelected = document.querySelector('input[name="complaintGroup"][value="Room"]').checked;
+    
+            // Show Area and Category for Common complaints, Category for Room complaints
+            document.getElementById('areaField').style.display = commonSelected ? 'block' : 'none';
+            document.getElementById('categoryField').style.display = commonSelected || roomSelected ? 'block' : 'none';
+            
+            // Show Time and Room fields for Room complaints
+            document.getElementById('timeField').style.display = roomSelected ? 'block' : 'none';
+            document.getElementById('roomField').style.display = roomSelected ? 'block' : 'none';
+            
+            // Clear the Requirement field
+            document.getElementById('requirement').innerHTML = '<option value="">Select Requirement</option>';
+        }
+    
+        function updateRequirements() {
+            let complaintGroup = document.querySelector('input[name="complaintGroup"]:checked');
+            if (!complaintGroup) {
+                console.log("No complaint group selected.");
+            return;
+            }
+
+            complaintGroup = complaintGroup.value;
+            console.log("Complaint Group:", complaintGroup);  // Debugging log
+
+            let requirement = document.getElementById('requirement');
+            requirement.innerHTML = '<option value="">Select Requirement</option>';  // Clear previous options
+
+    // Clear the Time field before updating it
+            let timeField = document.getElementById('timeField');
+            let timeSelect = timeField.querySelector('select'); // Get the <select> element inside the timeField container
+            timeSelect.innerHTML = "<option value=''>Select Time</option>"; 
+
+            if (complaintGroup === 'Common') {
+                // Common complaints (based on Area and Category)
+                let area = document.getElementById('area').value;
+                let category = document.getElementById('category').value;
+                console.log("Area Selected:", area);  // Debugging log
+                console.log("Category Selected:", category);  // Debugging log
+    
+                if (!area || !category) {
+                    console.log("No area or category selected.");
+                    return;
+                }
+
+                const commonRequirements = {
+                    Washroom: {
+                        Electrical: [
+                            { value: "Bathroom Light Repair", label: "Bathroom Light Repair" },
+                            { value: "Indian Toilet Light Repair", label: "Indian Toilet Light Repair" },
+                            { value: "Western Toilet Light Repair", label: "Western Toilet Light Repair" },
+                            { value: "Bathroom Exhaust Fan Repair", label: "Bathroom Exhaust Fan Repair" },
+                            { value: "Others", label: "Others" }
+                        ],
+                        Plumb: [
+                            { value: "Western Toilet Flush Repair", label: "Western Toilet Flush Repair" },
+                            { value: "Indian Toilet Flush Repair", label: "Indian Toilet Flush Repair" },
+                            { value: "Sink Tap Repair", label: "Sink Tap Repair" },
+                            { value: "Dirty Water in Flush", label: "Dirty Water in Flush" },
+                            { value: "Dirty water in sink", label: "Dirty water in sink" },
+                            { value: "Jet spray not working", label: "Jet spray not working" },
+                            { value: "Dirty Water in Jet Spray", label: "Dirty Water in Jet Spray" },
+                            { value: "Indian Toilet Tap Repair", label: "Indian Toilet Tap Repair" },
+                            { value: "Bathroom Tap Repair", label: "Bathroom Tap Repair" },
+                            { value: "Dirty water in Bathroom Tap", label: "Dirty water in Bathroom Tap" },
+                            { value: "Others", label: "Others" }
+                        ],
+                        Carpenter: [
+                            { value: "Washroom lock repair", label: "Washroom lock repair" },
+                            { value: "Indian Toilet lock repair", label: "Indian toilet lock repair" },
+                            { value: "Western toilet lock repair", label: "Western toilet lock repair" },
+                            { value: "Washroom Glass repair", label: "Washroom Glass repair" },
+                            { value: "Others", label: "Others" }
+                        ],
+                        Sweeper: [
+                            { value: "Bathroom drain hole blocked", label: "Bathroom drain hole blocked" },
+                            { value: "Clogging in sink", label: "Clogging in sink" },
+                            { value: "Clogging in Western Toilet Flush", label: "Clogging in Western Toilet Flush" },
+                            { value: "Clogging in Indian Toilet Flush", label: "Clogging in Indian Toilet Flush" },
+                            { value: "Garbage Removal", label: "Garbage removal" },
+                            { value: "Others", label: "Others" }
+                        ],
+                        Mason: [
+                            { value: "Bathroom wall/Floor repair", label: "Bathroom wall/Floor repair" },
+                            { value: "Sink repair", label: "Sink Repair" },
+                            { value: "Western toilet Floor/Wall repair", label: "Western toilet Floor/Wall repair" },
+                            { value: "Indian toilet Floor/Wall repair", label: "Indian toilet Floor/Wall repair" },
+                            { value: "Washroom Floor/Wall repair", label: "Washroom Floor/Wall repair" },
+                            { value: "Others", label: "Others" }
+                        ],
+                        Painter: [
+                            { value: "Bathroom wall whitewash", label: "Bathroom wall whitewash" },
+                            { value: "Paint bathroom door", label: "Paint bathroom door" },
+                            { value: "Paint Indian toilet door", label: "Paint Indian toilet door" },
+                            { value: "Paint western toilet door", label: "Paint western toilet door" },
+                            { value: "Others", label: "Others" }
+                        ],
+                        Worker: [
+                            { value: "Clean Indian toilet", label: "Clean Indian Toilet" },
+                            { value: "Clean western toilet", label: "Clean Western Toilet" },
+                            { value: "Clean entire washroom", label: "Clean entire washroom" },
+                            { value: "Clean washroom Sink", label: "Clean washroom Sink" },
+                            { value: "Clean Bathroom", label: "Clean Bathroom" },
+                            { value: "Clean Washroom dustbin", label: "Clean washroom dustbin" },
+                            { value: "Washroom dustbin unavailable", label: "Washroom dustbin unavailable" },
+                            { value: "Others", label: "Others" }
+                        ]
+                    },
+                    VisitorsRoom: {
+                        Electrical: [
+                            { value: "Visitors Room Light Repair", label: "Visitors Room Light Repair" },
+                            { value: "Visitors Room Fan Repair", label: "Visitors Room Fan Repair" }
+                        ],
+                        Mason: [
+                            { value: "Visitors Room Floor/wall repair", label: "Visitors Room Floor/wall repair" }
+                        ],
+                        Painter: [
+                            { value: "Visitors Room Whitewash", label: "Visitors Room Whitewash" }
+                        ],
+                        Carpenter: [
+                            { value: "Visitors room furniture repair", label: "Visitors room furniture repair" },
+                            { value: "Visitors room Lock repair", label: "Visitors room Lock repair" },
+                            { value: "Visitors room Door repair", label: "Visitors room Door repair" }
+                        ]
+                    },
+                    Mess: {
+                        Electrical: [
+                            { value: "Mess Light Repair", label: "Mess Light Repair" },
+                            { value: "Mess Fan Repair", label: "Mess Fan Repair" },
+                            { value: "Mess Exhaust Fan Repair", label: "Mess Exhaust Fan Repair" }
+                        ],
+                        Mason: [
+                            { value: "Mess floor/wall Repair", label: "Mess floor/wall Repair" }
+                        ],
+                        Painter: [
+                            { value: "Mess whitewash", label: "Mess whitewash" }
+                        ],
+                        Carpenter: [
+                            { value: "Mess furniture repair", label: "Mess furniture repair" }
+                        ],
+                        Sweeper: [
+                            { value: "Handwash Sink Clog", label: "Handwash Sink Clogr" }
+                        ],
+                        Plumber: [
+                            { value: "Mess Tap Repair", label: "Mess Tap repair" },
+                            { value: "Handwash Tap Repair", label: "Handwash Tap repair" }
+                        ]
+                    },
+                    WardenRoom: {
+                        Electrical: [
+                            { value: "Warden Room Light Repair", label: "Warden Room Light Repair" },
+                            { value: "Warden Room Switch Repair", label: "Warden Room Switch Repair" },
+                            { value: "Warden Room Fan Repair", label: "Warden Room Fan Repair" }
+                        ],
+                        Mason: [
+                            { value: "Warden Room wall/floor repair ", label: "Warden Room wall/floor repair " }
+                        ],
+                        Painter: [
+                            { value: "Warden Room wall whitewash", label: "Warden Room wall whitewash" }
+                        ],
+                        Worker: [
+                            { value: "Warden room clean", label: "warden room clean" }
+                        ],
+                        Carpenter: [
+                            { value: "Warden room furniture repair", label: "warden room furniture repair" }
+                        ]
+                    },
+                    Corridor: {
+                        Electrical: [
+                            { value: "Corridor Light Repair", label: "Corridor Light Repair" },
+                            { value: "Corridor Switch Repair", label: "Corridor Switch Repair" }
+                        ],
+                        Carpenter: [
+                            { value: "Corridor Glass repair", label: "Corridor Glass repair" }
+                        ],
+                        Worker: [
+                            { value: "Clean corridor", label: "Clean corridor" },
+                            { value: "Corridor dustbin unavailable", label: "Corridor dustbin unavailable" }
+                        ],
+                        Mason: [
+                            { value: "Corridor wall/floor repair ", label: "Corridor wall/floor repair " }
+                        ],
+                        Painter: [
+                            { value: "Corridor wall whitewash", label: "Corridor wall whitewash" }
+                        ]
+                    },
+                    CommonRoom: {
+                        Electrical: [
+                            { value: "Common Room AC Repair", label: "Common Room AC Repair" },
+                            { value: "Common Room TV Repair", label: "Common Room TV Repair" },
+                            { value: "Common Room Fan Repair", label: "Common Room Fan Repair" },
+                            { value: "Common Room Light Repair", label: "Common Room Light Repair" }
+                        ],
+                        Mason: [
+                            { value: "Common Room Floor/Wall Repair", label: "Common Room Floor/Wall Repair" }
+                        ],
+                        Painter: [
+                            { value: "Common Room Whitewash", label: "Common Room Whitewash" },
+                            { value: "Common Room Window frame paint", label: "Common Room Window frame paint" }
+                        ],
+                        Worker: [
+                            { value: "Common Room Clean", label: "Common Room Clean" }
+                        ],
+                        Carpentry: [
+                            { value: "Common room Furniture Repair", label: "Common room Furniture Repair" },
+                            { value: "Common room Lock Repair", label: "Common room Lock Repair" },
+                            { value: "Common room Door Repair", label: "Common room Door Repair" },
+                            { value: "Common room Window Repair", label: "Common room Window Repair" }
+                        ]
+                    },
+                    Garden: {
+                        Gardener: [
+                            { value: "Tree Trimming", label: "Tree Trimming" },
+                            { value: "Others", label: "Others" }
+                        ]
+                    },
+                    RO: {
+                        ROPerson: [
+                            { value: "Dirty water in tap", label: "Dirty water in Tap" },
+                            { value: "RO Tap broken", label: "RO Tap broken" },
+                            { value: "RO Broken", label: "RO Broken" },
+                            { value: "No water in RO", label: "No water in RO" },
+                            { value: "RO Leakage", label: "RO Leakage" },
+                            { value: "Drain Hole blocked", label: "Drain Hole blocked" },
+                            { value: "RO cleaning", label: "RO cleaning" },
+                            { value: "Switch ON//OFF Cold water", label: "Switch ON//OFF Cold water" },
+                            { value: "Others", label: "Others" }
+                        ]
+                    }
+        
+
+                };
+    
+                // Fetch the requirements based on the selected Area and Category
+                if (commonRequirements[area] && commonRequirements[area][category]) {
+                    commonRequirements[area][category].forEach(req => {
+                        let option = document.createElement('option');
+                        option.value = req.value;
+                        option.textContent = req.label;
+                        requirement.appendChild(option);
+                    });
+                } else {
+                    console.log("No requirements found for the selected area and category.");
+                }
+            } else if (complaintGroup === 'Room') {
+                // Room complaints (based on Category)
+                let category = document.getElementById('category').value;
+                console.log("Category Selected:", category);  // Debugging log
+    
+                if (!category) {
+                    console.log("No category selected.");
+                    return;
+                }
+    
+                const options = {
+                    Electrical: {
+                        Room: [
+                            { value: "Room Switch Repair", label: "Room Switch Repair" },
+                            { value: "Room Tube Light Repair", label: "Room Tube Light Repair" },
+                            { value: "Room Fan Repair", label: "Room Fan Repair" },
+                            { value: "Room Exhaust Fan Repair", label: "Room Exhaust Fan Repair" },
+                            { value: "Balcony Light Repair", label: "Balcony Light Repair" }
+                        ],
+                        timeSlots: [
+                            { value: "2-3", label: "2-3 pm" },
+                            { value: "3-4", label: "3-4 pm" },
+                            { value: "4-5", label: "4-5 pm" }
+                        ]
+                    },
+                    Carpentry: {
+                        Room: [
+                            { value: "Door lock repair", label: "Door lock repair" },
+                            { value: "Door latch repair", label: "Door latch repair" },
+                            { value: "Attach clothes rope", label: "Attach clothes rope" },
+                            { value: "Fixing Curtain Rod", label: "Fixing Curtain Rod" },
+                            { value: "Door Hanger unavailable", label: "Door Hanger unavailable" },
+                            { value: "Fix White board", label: "Fix White board" },
+                            { value: "White board unavailable", label: "White board unavailable" },
+                            { value: "Room shelf repair", label: "Room shelf repair" },
+                            { value: "Bed Repair", label: "Bed Repair" },
+                            { value: "Bed storage not opening", label: "Bed storage not opening" },
+                            { value: "Room Table Repair", label: "Room Table Repair" },
+                            { value: "Room table unavailable", label: "Room table unavailable" },
+                            { value: "Room chair repair", label: "Room chair repair" },
+                            { value: "Room chair unavailable", label: "Room chair unavailable" },
+                            { value: "Almirah Repair", label: "Almirah repair" },
+                            { value: "Almirah Unavailable", label: "Almirah Unavailable" },
+                            { value: "Chair Repair", label: "Chair Repair" },
+                            { value: "Door Repair", label: "Door Repair" }
+                        ],
+                        timeSlots: [
+                            { value: "11-12", label: "11-12 am" },
+                            { value: "12-1", label: "12-1 pm" },
+                            { value: "2-3", label: "2-3 pm" },
+                            { value: "3-4", label: "3-4 pm" }
+                        ]
+                    },
+                    Mason: {
+                        Room: [
+                            { value: "Balcony Floor/wall Repair", label: "Room Floor/wall Repair" }
+                        ],
+                        timeSlots: [
+                            { value: "11-12", label: "11-12 am" },
+                            { value: "12-1", label: "12-1 pm" },
+                            { value: "2-3", label: "2-3 pm" },
+                            { value: "3-4", label: "3-4 pm" }
+                        ]
+
+                    },
+                    Painter: {
+                        Room: [
+                            { value: "Room wall whitewash", label: "Room wall whitewash" },
+                            { value: "Balcony wall Whitewash", label: "Balcony wall Whitewash" },
+                            { value: "Paint room window frame", label: "Paint room window frame" },
+                            { value: "Paint balcony door", label: "Paint balcony door" },
+                            { value: "Paint Room door", label: "Paint Room door" }
+                        ],
+                        timeSlots: [
+                            { value: "11-12", label: "11-12 am" },
+                            { value: "12-1", label: "12-1 pm" },
+                            { value: "2-3", label: "2-3 pm" },
+                            { value: "3-4", label: "3-4 pm" }
+                        ]
+                    },
+                    Worker: {
+                        Room: [
+                            { value: "Clean room", label: "Clean room" },
+                            { value: "Shift heavy goods", label: "Shift heavy goods" }
+                        ],
+                        timeSlots: [
+                            { value: "11-12", label: "11-12 am" },
+                            { value: "12-1", label: "12-1 pm" },
+                            { value: "2-3", label: "2-3 pm" },
+                            { value: "3-4", label: "3-4 pm" }
+                        ]
+                    },
+                    Sweeper: {
+                        Room: [
+                            { value: "Balcony drain hole blocked", label: "Balcony drain hole blocked" }
+                        ],
+                        timeSlots: [
+                            { value: "11-12", label: "11-12 am" },
+                            { value: "12-1", label: "12-1 pm" },
+                            { value: "2-3", label: "2-3 pm" },
+                            { value: "3-4", label: "3-4 pm" }
+                        ]
+                    }
+                    
+                };
+    
+                // Only show the relevant requirements for the selected category
+                if (options[category] && options[category].Room) {
+                    options[category].Room.forEach(req => {
+                        let option = document.createElement('option');
+                        option.value = req.value;
+                        option.textContent = req.label;
+                        requirement.appendChild(option);
+                    });
+                } else {
+                    console.log("No requirements found for the selected category.");
+                }
+            }
+            
+            if (category === "Electrical") {
+                // electrical-specific time slots
+                let electricalTimeSlots = [
+                    { value: "2-3", label: "2-3 pm" },
+                    { value: "3-4", label: "3-4 pm" },
+                    { value: "4-5", label: "4-5 pm" },
+                ];
+                electricalTimeSlots.forEach(time => {
+                    let option = document.createElement('option');
+                    option.value = time.value;
+                    option.textContent = time.label;
+                    timeSelect.appendChild(option);  // Append to the time dropdown
+                });
+            } else {
+                // Default time slots for other requirements
+                let defaultTimeSlots = [
+                    { value: "11-12", label: "11-12 am" },
+                    { value: "12-1", label: "12-1 pm" },
+                    { value: "2-3", label: "2-3 pm" },
+                    { value: "3-4", label: "3-4 pm" },
+                    { value: "4-5", label: "4-5 pm" },
+                ];
+                defaultTimeSlots.forEach(time => {
+                    let option = document.createElement('option');
+                    option.value = time.value;
+                    option.textContent = time.label;
+                    timeSelect.appendChild(option);  // Append to the time dropdown
+                });
+            }
+        }
+        
+    </script>
+    
+</body>
+</html>

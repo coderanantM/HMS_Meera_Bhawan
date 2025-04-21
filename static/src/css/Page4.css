@@ -1,0 +1,135 @@
+.complaints-container {
+    font-family: Arial, sans-serif;
+    /* padding: 20px; */
+    text-align: center;
+  }
+  
+  header {
+    background-color: #f4f4f4;
+    padding: 10px;
+  }
+  
+  h2 {
+    margin-top: 20px;
+  }
+  
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 20px;
+  }
+  
+  .yellow-circle,
+  .green-circle {
+    width: 15px;
+    height: 15px;
+    display: inline-block;
+    border-radius: 50%;
+  }
+  
+  .yellow-circle {
+    background-color: yellow;
+  }
+  
+  .green-circle {
+    background-color: green;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+  
+  table th,
+  table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .yellow-button {
+    background-color: yellow;
+    border: none;
+    color: black;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    margin-right: 10px;
+  }
+  
+  .green-button {
+    background-color: green;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    cursor: pointer;
+    border-radius: 5px;
+  }
+
+  .button-group {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+  
+  button:hover {
+    opacity: 0.8;
+  }
+  
+  button[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* Status Column Styling */
+.status-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.current-status {
+  font-size: 0.9em;
+  color: #666;
+}
+
+.button-group {
+  display: flex;
+  gap: 8px;
+}
+
+.status-btn {
+  border: none;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 24px;
+  line-height: 0;
+  transition: opacity 0.2s;
+}
+
+.status-btn:hover {
+  opacity: 0.8;
+}
+
+.send-ems {
+  background-color: #FFD700;
+  color: #FFD700;
+}
+
+.approve {
+  background-color: #4CAF50;
+  color: #4CAF50;
+}
+
+.status-btn[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

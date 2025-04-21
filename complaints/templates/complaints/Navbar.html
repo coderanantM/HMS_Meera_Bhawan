@@ -1,0 +1,19 @@
+<!-- filepath: /c:/My files/hms/complaints/templates/complaints/Navbar.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'src/css/Navbar.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <button onclick="location.href='{% url 'page2' %}'">Home</button>
+        <button onclick="location.href='{% url 'page6' %}'">Student Complaints</button>
+        <button onclick="location.href='{% url 'previous_warden_complaints' %}'">Previous Complaints</button>
+        <button onclick="location.href='{% url 'ems_team' %}'">EMSTeam</button>
+        <button onclick="location.href='{% url 'team_info_warden' %}'">HMS Team</button>
+    </nav>
+</body>
+</html>

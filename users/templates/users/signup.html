@@ -1,0 +1,49 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'src/css/signup.css' %}">
+    <title>Sign Up - HMS</title>
+</head>
+<body>
+    <div class="signup-container">
+        <h1>Create Your Account</h1>
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-danger">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        <form class="signup-form" method="POST" action="{% url 'signup' %}">
+            {% csrf_token %}
+
+            <!-- Name Field -->
+            <label for="name">Name</label>
+            <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+
+            {{ form.email.label_tag }}
+            {{ form.email }}
+            
+            {{ form.password1.label_tag }}
+            {{ form.password1 }}
+            
+            {{ form.password2.label_tag }}
+            {{ form.password2 }}
+            
+            <label for="user_type">User Type</label>
+            <select id="user_type" name="user_type" required>
+                <option value="STUDENT">Student</option>
+                <option value="WARDEN">Warden</option>
+                <option value="SUPERINTENDENT">Superintendent</option>
+                <option value="EMS">EMS</option> <!-- Added EMS as a user type -->
+            </select>
+        
+            <button type="submit">Sign Up</button>
+        </form>
+        <p class="login-text">
+            Already have an account? <a href="{% url 'login_view' %}" class="login-link">Login</a>
+        </p>
+    </div>
+</body>
+</html>

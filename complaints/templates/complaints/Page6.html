@@ -1,0 +1,165 @@
+{% load static %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Student Complaints</title>
+    <link rel="stylesheet" href="{% static 'src/css/Page4.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/Head.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/Navbar.css' %}">
+</head>
+<body>
+    <div class="complaints-container">
+        <header>
+            {% include 'complaints/Head.html' %}
+            {% include 'complaints/Navbar.html' %}
+        </header>
+        <section>
+            <h2>Student Complaints</h2>
+            <div class="legend">
+                <div>
+                    <span class="yellow-circle"></span> Send to EMS: Approves the complaint and sends it directly to EMS
+                </div>
+                <div>
+                    <span class="green-circle"></span> Approve: Approves the complaint but does not send to EMS
+                </div>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sr. No</th>
+                        <th>IST</th>
+                        <th>Name</th>
+                        <th>BITS ID</th>
+                        <th>Contact No.</th>
+                        <th>Room No.</th>
+                        <th>Area</th>
+                        <th>Requirement</th>
+                        <th>Category</th>
+                        <th>Time</th>
+                        <th>Description</th>
+                        <th>Status</th>
+                        <th>EMS Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Complaints will be dynamically inserted here -->
+                </tbody>
+            </table>
+        </section>
+    </div>
+    <script>
+        // Define the updateStatus function in the global scope
+        function updateEMSStatus(complaintId, newStatus) {
+            fetch('/complaints/api/update-complaint-status/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: `complaint_id=${complaintId}&new_status=${newStatus}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+        
+                    // Update the Status field dynamically
+                    const statusCell = document.querySelector(`#status-${complaintId}`);
+                    if (statusCell) {
+                        statusCell.innerHTML = `<span>${newStatus}</span>`; // Update the status text
+                    }
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error updating status:', error);
+                alert('An error occurred while updating the status.');
+            });
+        }
+
+        function updateComplaintStatus(complaintId, newStatus) {
+            // Fetch the CSRF token from the meta tag
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+        
+            fetch('/complaints/api/update-complaint-status/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrfToken, // Include CSRF token
+                },
+                body: `complaint_id=${complaintId}&new_status=${newStatus}`,
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.success) {
+                        alert(data.message);
+        
+                        // Update the Status field dynamically
+                        const statusCell = document.querySelector(`#status-${complaintId}`);
+                        if (statusCell) {
+                            statusCell.innerHTML = `<span>${newStatus}</span>`; // Update the status text
+                        }
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error updating status:', error);
+                    alert('An error occurred while updating the status.');
+                });
+        }
+        
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            fetchStudentComplaints();
+        });
+        
+        function fetchStudentComplaints() {
+            fetch('/complaints/api/student-complaints-for-warden/')
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.querySelector('tbody');
+                    tbody.innerHTML = ''; // Clear existing rows
+        
+                    data.forEach((complaint, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${index + 1}</td>
+                            <td>${complaint.IST}</td>
+                            <td>${complaint.name}</td>
+                            <td>${complaint.bitsId}</td>
+                            <td>${complaint.contact_no}</td>
+                            <td>${complaint.room}</td>
+                            <td>${complaint.area}</td>
+                            <td>${complaint.requirement}</td>
+                            <td>${complaint.category}</td>
+                            <td>${complaint.preferred_time}</td>
+                            <td>${complaint.description}</td>
+                            <td id="status-${complaint.id}">
+                                ${complaint.status === "Pending" ? `
+                                    <div class="button-group">
+                                        <button class="yellow-button" onclick="updateComplaintStatus(${complaint.id}, 'Sent to EMS')">Send to EMS</button>
+                                        <button class="green-button" onclick="updateComplaintStatus(${complaint.id}, 'In Progress')">Approve</button>
+                                    </div>
+                                ` : `<span>${complaint.status}</span>`}
+                            </td>
+                            <td id="ems-status-${complaint.id}">
+                                <span>${complaint.ems_status || "Pending"}</span> <!-- Render EMS Status -->
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching complaints:', error);
+                });
+        }
+        
+    </script>
+</body>
+</html>

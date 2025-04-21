@@ -1,0 +1,100 @@
+.complaint-form {
+    margin: 20px auto;
+    width: 40%;
+    background-color: #fff7f0;
+    padding: 20px;
+    border: 1px solid #e27145;
+    border-radius: 10px;
+  }
+  
+  .form-group {
+    margin: 15px 0;
+    text-align: left;
+  }
+  
+  label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+  }
+  .horizontal-option {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* Adjust spacing between "Complaint Group" and the options */
+  }
+  
+  .options {
+    display: flex;
+    gap: 10px; /* Adjust spacing between "Common" and "Room" options */
+  }
+  
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Space between the radio button and its label */
+  }
+  
+  input,
+  select,
+  textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    display: flex;
+  }
+  .radio-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .radio-group label {
+    margin-right: 10px;
+  }
+  
+  .center-container {
+    display: flex;
+    justify-content: center; 
+    align-items: center; 
+    margin-top: 20px; 
+    height: 100px; 
+}
+  .orange-button {
+    color: white;
+    background-color: #e27145;
+    border: none;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 50%;
+  }
+  
+  .logout-btn {
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+.logout-btn:hover {
+    background-color: #c9302c;
+}
+
+.red-button {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.red-button:hover {
+  background-color: #cc0000;
+}

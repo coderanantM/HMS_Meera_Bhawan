@@ -1,0 +1,116 @@
+/* Page7.css */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background-color: #faf7f0; /* very light cream */
+  color: #555;
+}
+
+.complaints-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.Main-text h2 {
+  font-size: 2rem;
+  color: #333;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 30px;
+}
+
+table th,
+table td {
+  padding: 12px 8px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+table th {
+  background-color: transparent;
+  color: #777;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+table tbody tr:hover {
+  background-color: #fff7e6; /* subtle highlight on hover */
+}
+
+.approve-button {
+  display: inline-block;
+  padding: 6px 18px;
+  font-size: 1rem;
+  color: #fff;
+  background-color: #ff9500d5;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.approve-button:hover {
+  opacity: 0.9;
+}
+
+.center-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 30px 0 20px;
+}
+
+.dropdown,
+.input-box {
+  padding: 8px 12px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+
+.red-button {
+  padding: 10px 24px;
+  font-size: 1rem;
+  color: #fff;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.orange-button {
+  padding: 10px 24px;
+  font-size: 1rem;
+  color: #fff;
+  background-color: #ff9500d5;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.2s;
+}
+
+.red-button {
+  background-color: #e74c3c;
+}
+
+.orange-button:hover{
+  opacity: 0.9;
+}
+
+.red-button:hover {
+  opacity: 0.9;
+}

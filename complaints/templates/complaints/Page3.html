@@ -1,0 +1,20 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page 3</title>
+    <link rel="stylesheet" href="{% static 'src/css/Head.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/Navbar.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/Contact.css' %}">
+    <link rel="stylesheet" href="{% static 'src/css/Page3.css' %}">
+</head>
+<body>
+    <div class="app-container">
+        {% include 'complaints/Head.html' %}
+        {% include 'complaints/Navbar.html' %}
+        {% include 'complaints/Contact.html' %}
+    </div>
+</body>
+</html>
