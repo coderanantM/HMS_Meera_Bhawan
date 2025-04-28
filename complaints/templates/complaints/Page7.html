@@ -59,7 +59,7 @@
             fetchActiveComplaints();
     
             // Add event listener to the Export to CSV button
-            document.getElementById('export-csv-btn').addEventListener('click', exportToCSV);
+            document.getElementById('print-receipt-btn').addEventListener('click', exportToCSV);
         });
     
         function fetchActiveComplaints() {
@@ -165,47 +165,47 @@
             const dropdown = document.getElementById('sr-no-dropdown');
             const inputBox = document.getElementById('sr-no-input');
             const selectedSrNo = dropdown.value || inputBox.value; // Use dropdown value or input box value
-
-    if (!selectedSrNo) {
-        alert('Please select or enter a Sr. No to export.');
-        return;
-    }
-
-    // Find the selected complaint in the table
-    const tbody = document.getElementById('active-complaints-tbody');
-    const rows = tbody.querySelectorAll('tr');
-    let selectedComplaintData = null;
-
-    rows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        const srNo = cells[0].textContent.trim(); // Assuming the first column contains the Sr. No
-        if (srNo === selectedSrNo) {
-            selectedComplaintData = Array.from(cells).map(cell => cell.textContent.trim());
-        }
-    });
-
-    if (!selectedComplaintData) {
-        alert('Selected complaint not found.');
-        return;
-    }
-
-    // Generate CSV content
-    let csvContent = 'data:text/csv;charset=utf-8,';
-    csvContent += 'Sr. No,IST,Bhavan,Room No.,Requirement,Category,Time,Description,Status\n'; // Header row
-    csvContent += selectedComplaintData.join(',') + '\n';
-
-    // Create a downloadable link
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `complaint_srno_${selectedSrNo}.csv`);
-    document.body.appendChild(link);
-
-    // Trigger the download
-    link.click();
-
-    // Clean up
-    document.body.removeChild(link);
+        
+            if (!selectedSrNo) {
+                alert('Please select or enter a Sr. No to export.');
+                return;
+            }
+        
+            // Find the selected complaint in the table
+            const tbody = document.getElementById('active-complaints-tbody');
+            const rows = tbody.querySelectorAll('tr');
+            let selectedComplaintData = null;
+        
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const srNo = cells[0].textContent.trim(); // Assuming the first column contains the Sr. No
+                if (srNo === selectedSrNo) {
+                    selectedComplaintData = Array.from(cells).map(cell => cell.textContent.trim());
+                }
+            });
+        
+            if (!selectedComplaintData) {
+                alert('Selected complaint not found.');
+                return;
+            }
+        
+            // Generate CSV content
+            let csvContent = 'data:text/csv;charset=utf-8,';
+            csvContent += 'Sr. No,IST,Bhavan,Room No.,Requirement,Category,Time,Description,Status\n'; // Header row
+            csvContent += selectedComplaintData.join(',') + '\n';
+        
+            // Create a downloadable link
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', `complaint_srno_${selectedSrNo}.csv`);
+            document.body.appendChild(link);
+        
+            // Trigger the download
+            link.click();
+        
+            // Clean up
+            document.body.removeChild(link);
         }
     </script>
 </body>

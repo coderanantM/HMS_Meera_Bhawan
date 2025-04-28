@@ -7,14 +7,8 @@ from django.contrib import messages
 from .forms import EmailAuthenticationForm, RegisterForm
 from users.models import CustomUser  # Import CustomUser explicitly
 from django.views.decorators.csrf import csrf_exempt
-import firebase_admin
-from firebase_admin import credentials, auth
 import json
 
-# Initialize Firebase Admin SDK
-if not firebase_admin._apps:
-    cred = credentials.Certificate("firebase_config.json")  # Replace with your Firebase Admin SDK credentials
-    firebase_admin.initialize_app(cred)
 
 User = get_user_model()
 
